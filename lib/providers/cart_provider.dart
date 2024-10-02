@@ -1,17 +1,15 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_files/models/product.dart';
 
-class CartNotfier extends Notifier<Set<Product>> {
-  // initail value
+part 'cart_provider.g.dart';
+
+@riverpod
+class CartNotifier extends _$CartNotifier {
+  // 수정: CartNotfier -> CartNotifier
+  // initial value
   @override
   Set<Product> build() {
-    return {
-      const Product(
-          id: '4',
-          title: 'Red Backpack',
-          price: 14,
-          image: 'assets/products/backpack.png'),
-    };
+    return const {};
   }
 
   // methods to update the state
@@ -22,12 +20,26 @@ class CartNotfier extends Notifier<Set<Product>> {
   }
 
   void removeProduct(Product product) {
-    state = state.where((p) => p.id != product.id).toSet();
+    if (state.contains(product)) {
+      state = state.where((p) => p.id != product.id).toSet();
+    }
   }
 }
 
-final cartNotifierProvider = NotifierProvider<CartNotfier, Set<Product>>(
-  () {
-    return CartNotfier();
-  },
-);
+@riverpod
+int carTotal(ref) {
+  final cartProducts = ref.watch(cartNotifierProvider);
+
+  int total = 0;
+
+  for (Product product in cartProducts) {
+    total += product.price;
+  }
+
+  return total;
+}
+// final cartNotifierProvider = NotifierProvider<CartNotifier, Set<Product>>(
+//   () {
+//     return CartNotifier();
+//   },
+// );
